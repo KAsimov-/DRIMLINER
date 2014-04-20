@@ -345,6 +345,11 @@ void ledBoard::blink(float interval, int duration){
 	_LED_NUMBER[order_number][_start_time] = micros();
 }
 
+Dynamixel Dxl(1);
+
+void ezDynamixelBegin(int baud){
+	Dxl.begin(baud);
+}
 
 ezDynamixel::ezDynamixel(int id){
 	myID = id;

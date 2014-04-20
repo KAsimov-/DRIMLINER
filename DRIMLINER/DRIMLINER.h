@@ -62,8 +62,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wirish.h"
 #include "dynamixel.h"
 
-Dynamixel Dxl(1);
-
 class lightSensor {
 public:
 	lightSensor(int pin, int range);
