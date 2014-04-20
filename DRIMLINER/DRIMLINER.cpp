@@ -347,12 +347,13 @@ void ledBoard::blink(float interval, int duration){
 
 Dynamixel Dxl(1);
 
-void ezDynamixelBegin(int baud){
-	Dxl.begin(baud);
-}
 
 ezDynamixel::ezDynamixel(int id){
 	myID = id;
+}
+
+void ezDynamixel::begin(int baud){
+	Dxl.begin(baud);
 }
 
 void ezDynamixel::resetSettings(void){

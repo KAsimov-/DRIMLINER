@@ -119,6 +119,7 @@ private:
 class ezDynamixel {
 public:
 	ezDynamixel(int id);
+	void begin(int baud);
 	void resetSettings(void);
 	int readModelNumber(void);
 	int readFirmwareVersion(void);
