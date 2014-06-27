@@ -105,9 +105,9 @@ private:
 	int order_number;
 };
 
-class ledBoard {
+class ledModule {
 public:
-	ledBoard(int pin);
+	ledModule(int pin);
 	void on(void);
 	void off(void);
 	void blink(float interval, int amount);

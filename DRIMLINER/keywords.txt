@@ -6,12 +6,12 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-LIGHT	KEYWORD1
-TEMP	KEYWORD1
-HALL	KEYWORD1
-BUTTON	KEYWORD1
-LED		KEYWORD1
-DXL		KEYWORD1
+lightSensor	KEYWORD1
+temperatureSensor	KEYWORD1
+hallSensor	KEYWORD1
+buttonSwitch	KEYWORD1
+ledModule		KEYWORD1
+ezDynamixel		KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

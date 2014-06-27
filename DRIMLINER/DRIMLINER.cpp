@@ -316,7 +316,7 @@ void _led_blink_init(void){
 }
 
 
-ledBoard::ledBoard(int pin){
+ledModule::ledModule(int pin){
 	pin_number = pin;
 	pinMode(pin_number, OUTPUT);
 	for (int counter = 0; counter < 25; counter++){
@@ -327,17 +327,17 @@ ledBoard::ledBoard(int pin){
 	}
 }
 
-void ledBoard::on(void){
+void ledModule::on(void){
 	//pinMode(pin_number, OUTPUT);
 	digitalWrite(pin_number, HIGH);
 }
 
-void ledBoard::off(void){
+void ledModule::off(void){
 	digitalWrite(pin_number, LOW);
 	//pinMode(pin_number, INPUT);
 }
 
-void ledBoard::blink(float interval, int duration){
+void ledModule::blink(float interval, int duration){
 	if (!_has_led_init)_led_blink_init();
 	_LED_NUMBER[order_number][_pin_number] = pin_number;
 	_LED_NUMBER[order_number][_interval] = int(interval * 1000000);
