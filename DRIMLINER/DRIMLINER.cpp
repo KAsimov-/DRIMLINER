@@ -26,13 +26,14 @@ Dream Realize Imagine Make
 Library for interfacing
 DRIMLINER Shield for OPENCM9.04
 
-Written by Mingyu Kim
+Program written by Mingyu Kim
+Board supported by Jeeho Ahn
 - inquiries please email
 mingyu@mingyu.co.kr
 
-Library Version 1.1
+Library Version 1.3
 For OPENCM IDE 1.0.1
-Last Updated on Mar. 13 2014
+Last Updated on Jun. 28 2014
 
 Clubs Participating in DRIMLINER Project
 - KAsimov of Korea University
@@ -59,26 +60,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "DRIMLINER.h"
 
-lightSensor::lightSensor(int pin, int range) {
+CdSModule::CdSModule(int pin, int range) {
 	pin_number = pin;
 	range_number = range;
 }
 
-lightSensor::lightSensor(int pin) {
+CdSModule::CdSModule(int pin) {
 	pin_number = pin;
 	range_number = 20;
 }
 
-int lightSensor::read(void){
+int CdSModule::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	int temp = map(analogRead(pin_number), 0, 4095, 0, range_number);
 	pinMode(pin_number, INPUT);
 	return temp;
 }
 
-int lightSensor::check(void){
+int CdSModule::check(void){
 	pinMode(pin_number, INPUT_ANALOG);
-	int temp = lightSensor::read();
+	int temp = CdSModule::read();
 	SerialUSB.print("light sensor at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" is reading : ");
@@ -93,7 +94,7 @@ temperatureSensor::temperatureSensor(int pin) {
 
 float temperatureSensor::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
-	float temp = ((float)analogRead(pin_number) * 3300 / 4096 - 500) / 10;
+	float temp = (((float)analogRead(pin_number) * 3300 / 4096)-400) / 19.5;
 	pinMode(pin_number, INPUT);
 	return temp;
 }
@@ -183,7 +184,7 @@ void event9(){
 	_last_press[9] = micros();
 }
 
-buttonSwitch::buttonSwitch(int pin){
+ButtonModule::ButtonModule(int pin){
 	pin_number = pin;
 	for (int counter = 0; counter < 10; counter++){
 		if (_button_pins[counter] == -1){
@@ -229,23 +230,23 @@ buttonSwitch::buttonSwitch(int pin){
 }
 
 
-int buttonSwitch::timeSincePressed(void){
+int ButtonModule::timeSincePressed(void){
 	return (micros() - _last_press[order_number]) / 1000;
 }
 
-int buttonSwitch::howManyTimes(void){
+int ButtonModule::howManyTimes(void){
 	return _countup[order_number];
 }
 
-void buttonSwitch::timesReset(void){
+void ButtonModule::timesReset(void){
 	_countup[order_number] = 0;
 }
 
-int buttonSwitch::read(void){
+int ButtonModule::read(void){
 	return digitalRead(pin_number);
 }
 
-int buttonSwitch::check(void){
+int ButtonModule::check(void){
 	SerialUSB.print("button at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" has been pressed ");
@@ -255,7 +256,7 @@ int buttonSwitch::check(void){
 	SerialUSB.println(" seconds have passed since last pressed");
 }
 
-void buttonSwitch::setDebounce(int time){
+void ButtonModule::setDebounce(int time){
 	_debounce[order_number] = time * 1000;
 }
 
@@ -482,4 +483,43 @@ void ezDynamixel::setPunch(int newPunch){
 
 int ezDynamixel::isError(void){
 	return Dxl.readByte(myID, P_ALARM_SHUTDOWN);
+}
+
+
+buzzer::buzzer(void){
+	pinMode(15, OUTPUT);
+	digitalWrite(15, LOW);
+}
+
+void buzzer::on(void){
+	pinMode(15, OUTPUT);
+	digitalWrite(15, HIGH);
+}
+
+void buzzer::off(void){
+	digitalWrite(15, LOW);
+	pinMode(15, INPUT);
+}
+
+
+IRsensor::IRsensor(int pin){
+	pin_number = pin;
+	pinMode(pin_number, INPUT_ANALOG);
+}
+
+int IRsensor::read(void){
+	int readvalue = analogRead(pin_number);
+	if (readvalue > 1200){
+		return 1;
+	}
+	else if (readvalue < 1200) {
+		return 0;
+	}
+}
+
+void IRsensor::check(void){
+	SerialUSB.print("Infrared sensor at pin ");
+	SerialUSB.print(pin_number);
+	SerialUSB.print(" is reading : ");
+	SerialUSB.println(analogRead(pin_number));
 }

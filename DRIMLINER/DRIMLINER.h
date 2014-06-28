@@ -26,13 +26,14 @@ Dream Realize Imagine Make
 Library for interfacing
 DRIMLINER Shield for OPENCM9.04
 
-Written by Mingyu Kim
+Program written by Mingyu Kim
+Board supported by Jeeho Ahn
 - inquiries please email
 mingyu@mingyu.co.kr
 
-Library Version 1.1
+Library Version 1.3
 For OPENCM IDE 1.0.1
-Last Updated on Mar. 13 2014
+Last Updated on Jun. 28 2014
 
 Clubs Participating in DRIMLINER Project
 - KAsimov of Korea University
@@ -62,10 +63,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wirish.h"
 #include "dynamixel.h"
 
-class lightSensor {
+class CdSModule {
 public:
-	lightSensor(int pin, int range);
-	lightSensor(int pin);
+	CdSModule(int pin, int range);
+	CdSModule(int pin);
 	int read(void);
 	int check(void);
 private:
@@ -91,9 +92,9 @@ private:
 	int pin_number;
 };
 
-class buttonSwitch {
+class ButtonModule {
 public:
-	buttonSwitch(int pin);
+	ButtonModule(int pin);
 	int timeSincePressed(void);
 	int howManyTimes(void);
 	void timesReset(void);
@@ -155,14 +156,24 @@ private:
 	int myID;
 };
 
-/*****************************************
-class INFRARED {
+class buzzer{
 public:
-INFRARED(int pin1, int pin2);
+	buzzer(void);
+	void on(void);
+	void off(void);
 private:
-int pin_number_1;
-int pin_number_2;
+
 };
 
-*****************************************/
+
+class IRsensor {
+public:
+	IRsensor(int pin);
+	int read(void);
+	void check(void);
+
+private:
+int pin_number;
+};
+
 #endif
