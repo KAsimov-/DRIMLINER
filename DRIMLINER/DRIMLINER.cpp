@@ -31,9 +31,9 @@ Board supported by Jeeho Ahn
 - inquiries please email
 mingyu@mingyu.co.kr
 
-Library Version 1.3
+Library Version 1.4
 For OPENCM IDE 1.0.1
-Last Updated on Jun. 28 2014
+Last Updated on Jun. 30. 2014
 
 Clubs Participating in DRIMLINER Project
 - KAsimov of Korea University
@@ -60,26 +60,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "DRIMLINER.h"
 
-CdSModule::CdSModule(int pin, int range) {
+////////////////////////////////////////////////////////////////////////
+///////////////     C             D             S     //////////////////
+////////////////////////////////////////////////////////////////////////
+
+cdsModule::cdsModule(int pin, int range) {
 	pin_number = pin;
 	range_number = range;
 }
 
-CdSModule::CdSModule(int pin) {
+cdsModule::cdsModule(int pin) {
 	pin_number = pin;
 	range_number = 20;
 }
 
-int CdSModule::read(void){
+int cdsModule::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	int temp = map(analogRead(pin_number), 0, 4095, 0, range_number);
 	pinMode(pin_number, INPUT);
 	return temp;
 }
 
-int CdSModule::check(void){
+int cdsModule::check(void){
 	pinMode(pin_number, INPUT_ANALOG);
-	int temp = CdSModule::read();
+	int temp = cdsModule::read();
 	SerialUSB.print("light sensor at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" is reading : ");
@@ -88,19 +92,26 @@ int CdSModule::check(void){
 	return temp;
 }
 
-temperatureSensor::temperatureSensor(int pin) {
+
+
+
+////////////////////////////////////////////////////////////////////////
+///////////////    T        E         M         P     //////////////////
+////////////////////////////////////////////////////////////////////////
+
+temperatureModule::temperatureModule(int pin) {
 	pin_number = pin;
 }
 
-float temperatureSensor::read(void){
+float temperatureModule::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	float temp = (((float)analogRead(pin_number) * 3300 / 4096)-400) / 19.5;
 	pinMode(pin_number, INPUT);
 	return temp;
 }
 
-float temperatureSensor::check(void){
-	float temp = temperatureSensor::read();
+float temperatureModule::check(void){
+	float temp = temperatureModule::read();
 	SerialUSB.print("temperature sensor at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" is reading : ");
@@ -109,19 +120,26 @@ float temperatureSensor::check(void){
 	return temp;
 }
 
-hallSensor::hallSensor(int pin) {
+
+
+
+////////////////////////////////////////////////////////////////////////
+///////////////    H        A         L         L     //////////////////
+////////////////////////////////////////////////////////////////////////
+
+hallModule::hallModule(int pin) {
 	pin_number = pin;
 }
 
-int hallSensor::read(void){
+int hallModule::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	int temp = 23 + (((analogRead(pin_number) * 3300 / 4096) - 1691) / 1.3);
 	pinMode(pin_number, INPUT);
 	return temp;
 }
 
-int hallSensor::check(void){
-	int temp = hallSensor::read();
+int hallModule::check(void){
+	int temp = hallModule::read();
 	SerialUSB.print("hall sensor at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" is reading : ");
@@ -129,124 +147,191 @@ int hallSensor::check(void){
 	return temp;
 }
 
-int _button_pins[10] = { -1, };
+
+
+////////////////////////////////////////////////////////////////////////
+///////////////    B     U     T     T     O     N    //////////////////
+////////////////////////////////////////////////////////////////////////
+
+int _button_pins[10] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 int _debounce[10];
 int _countup[10];
+int _echo[10];
+int _int_pin_number[10];
 volatile long _last_press[10];
 
-void event0(){
-	if (micros() - _last_press[0] > _debounce[0]) _countup[0]++;
-	_last_press[0] = micros();
-}
-
-void event1(){
-	if (micros() - _last_press[1] > _debounce[1]) _countup[1]++;
-	_last_press[1] = micros();
-}
-
-void event2(){
-	if (micros() - _last_press[2] > _debounce[2]) _countup[2]++;
-	_last_press[2] = micros();
-}
-
-void event3(){
-	if (micros() - _last_press[3] > _debounce[3]) _countup[3]++;
-	_last_press[3] = micros();
-}
-
-void event4(){
-	if (micros() - _last_press[4] > _debounce[4]) _countup[4]++;
-	_last_press[4] = micros();
-}
-
-void event5(){
-	if (micros() - _last_press[5] > _debounce[5]) _countup[5]++;
-	_last_press[5] = micros();
-}
-
-void event6(){
-	if (micros() - _last_press[6] > _debounce[6]) _countup[6]++;
-	_last_press[6] = micros();
-}
-
-void event7(){
-	if (micros() - _last_press[7] > _debounce[7]) _countup[7]++;
-	_last_press[7] = micros();
-}
-
-void event8(){
-	if (micros() - _last_press[8] > _debounce[8]) _countup[8]++;
-	_last_press[8] = micros();
-}
-
-void event9(){
-	if (micros() - _last_press[9] > _debounce[9]) _countup[9]++;
-	_last_press[9] = micros();
-}
-
-ButtonModule::ButtonModule(int pin){
-	pin_number = pin;
+void echoMe(){
 	for (int counter = 0; counter < 10; counter++){
-		if (_button_pins[counter] == -1){
+		if (_echo[counter] > 0){
+			SerialUSB.print("Pin");
+			SerialUSB.print(_int_pin_number[counter]);
+			SerialUSB.println(" Button On");
+		}
+	}
+}
+
+void event0(){
+	if (micros() - _last_press[0] > _debounce[0]){
+		_countup[0]++;
+		_last_press[0] = micros();
+		echoMe();
+	}
+}
+void event1(){
+	if (micros() - _last_press[1] > _debounce[1]){
+		_countup[1]++;
+		_last_press[1] = micros();
+		echoMe();
+	}
+}
+void event2(){
+	if (micros() - _last_press[2] > _debounce[2]){
+		_countup[2]++;
+		_last_press[2] = micros();
+		echoMe();
+	}
+}
+void event3(){
+	if (micros() - _last_press[3] > _debounce[3]){
+		_countup[3]++;
+		_last_press[3] = micros();
+		echoMe();
+	}
+}
+void event4(){
+	if (micros() - _last_press[4] > _debounce[4]){
+		_countup[4]++;
+		_last_press[4] = micros();
+		echoMe();
+	}
+}
+void event5(){
+	if (micros() - _last_press[5] > _debounce[5]){
+		_countup[5]++;
+		_last_press[5] = micros();
+		echoMe();
+	}
+}
+void event6(){
+	if (micros() - _last_press[6] > _debounce[6]){
+		_countup[6]++;
+		_last_press[6] = micros();
+		echoMe();
+	}
+}
+void event7(){
+	if (micros() - _last_press[7] > _debounce[7]){
+		_countup[7]++;
+		_last_press[7] = micros();
+		echoMe();
+	}
+}
+void event8(){
+	if (micros() - _last_press[8] > _debounce[8]){
+		_countup[8]++;
+		_last_press[8] = micros();
+		echoMe();
+	}
+}
+void event9(){
+	if (micros() - _last_press[9] > _debounce[9]){
+		_countup[9]++;
+		_last_press[9] = micros();
+		echoMe();
+	}
+}
+
+buttonModule::buttonModule(int pin){
+	pin_number = pin;
+	pinMode(pin_number, INPUT);
+
+	for (int counter = 0; counter < 10; counter++){
+		if (_button_pins[counter] < 0){
 			_button_pins[counter] = pin_number;
 			order_number = counter;
+			//SerialUSB.print("Before me ");
+			SerialUSB.print(order_number);
+			_int_pin_number[order_number] = pin_number;
+			//SerialUSB.println(" buttons are attached");
 			break;
 		}
 	}
+
 	switch (order_number){
 	case 0:
 		attachInterrupt(pin_number, event0, RISING);
+		//SerialUSB.print("EVENT 0 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 1:
 		attachInterrupt(pin_number, event1, RISING);
+		//SerialUSB.print("EVENT 1 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 2:
 		attachInterrupt(pin_number, event2, RISING);
+		//SerialUSB.print("EVENT 2 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 3:
 		attachInterrupt(pin_number, event3, RISING);
+		//SerialUSB.print("EVENT 3 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 4:
 		attachInterrupt(pin_number, event4, RISING);
+		//SerialUSB.print("EVENT 4 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 5:
 		attachInterrupt(pin_number, event5, RISING);
+		//SerialUSB.print("EVENT 5 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 6:
 		attachInterrupt(pin_number, event6, RISING);
+		//SerialUSB.print("EVENT 6 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 7:
 		attachInterrupt(pin_number, event7, RISING);
+		//SerialUSB.print("EVENT 7 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 8:
 		attachInterrupt(pin_number, event8, RISING);
+		//SerialUSB.print("EVENT 8 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	case 9:
 		attachInterrupt(pin_number, event9, RISING);
+		//SerialUSB.print("EVENT 9 attached to ");
+		SerialUSB.println(pin_number);
 		break;
 	}
 	_debounce[order_number] = 50 * 1000;
 	_countup[order_number] = 0;
+	_echo[order_number] = 0;
 }
 
 
-int ButtonModule::timeSincePressed(void){
+int buttonModule::timeSincePressed(void){
 	return (micros() - _last_press[order_number]) / 1000;
 }
 
-int ButtonModule::howManyTimes(void){
+int buttonModule::howManyTimes(void){
 	return _countup[order_number];
 }
 
-void ButtonModule::timesReset(void){
+void buttonModule::timesReset(void){
 	_countup[order_number] = 0;
 }
 
-int ButtonModule::read(void){
+int buttonModule::read(void){
 	return digitalRead(pin_number);
 }
 
-int ButtonModule::check(void){
+int buttonModule::check(void){
 	SerialUSB.print("button at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" has been pressed ");
@@ -256,9 +341,31 @@ int ButtonModule::check(void){
 	SerialUSB.println(" seconds have passed since last pressed");
 }
 
-void ButtonModule::setDebounce(int time){
+void buttonModule::debug(void){
+	SerialUSB.print("button at pin ");
+	SerialUSB.print(pin_number);
+	SerialUSB.print(" is attached to event ");
+	SerialUSB.println(order_number);
+}
+
+void buttonModule::setDebounce(int time){
 	_debounce[order_number] = time * 1000;
 }
+
+void buttonModule::echoOn(void){
+	_echo[order_number] = 1;
+}
+
+void buttonModule::echoOff(void){
+	_echo[order_number] = 0;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+///////////////     L             E             D     //////////////////
+////////////////////////////////////////////////////////////////////////
+
 
 #define _pin_number 0
 #define _interval 1
@@ -346,8 +453,13 @@ void ledModule::blink(float interval, int duration){
 	_LED_NUMBER[order_number][_start_time] = micros();
 }
 
-Dynamixel Dxl(1);
 
+
+////////////////////////////////////////////////////////////////////////
+///////////////     D             X             L     //////////////////
+////////////////////////////////////////////////////////////////////////
+
+Dynamixel Dxl(1);
 
 ezDynamixel::ezDynamixel(int id){
 	myID = id;
@@ -486,28 +598,38 @@ int ezDynamixel::isError(void){
 }
 
 
-buzzer::buzzer(void){
+
+
+////////////////////////////////////////////////////////////////////////
+///////////////    B        U         Z         Z     //////////////////
+////////////////////////////////////////////////////////////////////////
+
+buzzerModule::buzzerModule(void){
 	pinMode(15, OUTPUT);
 	digitalWrite(15, LOW);
 }
 
-void buzzer::on(void){
-	pinMode(15, OUTPUT);
+void buzzerModule::on(void){
 	digitalWrite(15, HIGH);
 }
 
-void buzzer::off(void){
+void buzzerModule::off(void){
 	digitalWrite(15, LOW);
-	pinMode(15, INPUT);
 }
 
 
-IRsensor::IRsensor(int pin){
+
+
+////////////////////////////////////////////////////////////////////////
+///////////////     I                           R     //////////////////
+////////////////////////////////////////////////////////////////////////
+
+irModule::irModule(int pin){
 	pin_number = pin;
 	pinMode(pin_number, INPUT_ANALOG);
 }
 
-int IRsensor::read(void){
+int irModule::read(void){
 	int readvalue = analogRead(pin_number);
 	if (readvalue > 1200){
 		return 1;
@@ -517,7 +639,7 @@ int IRsensor::read(void){
 	}
 }
 
-void IRsensor::check(void){
+void irModule::check(void){
 	SerialUSB.print("Infrared sensor at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" is reading : ");

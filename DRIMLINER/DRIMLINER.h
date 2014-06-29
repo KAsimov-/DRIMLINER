@@ -63,10 +63,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wirish.h"
 #include "dynamixel.h"
 
-class CdSModule {
+class cdsModule {
 public:
-	CdSModule(int pin, int range);
-	CdSModule(int pin);
+	cdsModule(int pin, int range);
+	cdsModule(int pin);
 	int read(void);
 	int check(void);
 private:
@@ -74,33 +74,36 @@ private:
 	int range_number;
 };
 
-class temperatureSensor {
+class temperatureModule {
 public:
-	temperatureSensor(int pin);
+	temperatureModule(int pin);
 	float read(void);
 	float check(void);
 private:
 	int pin_number;
 };
 
-class hallSensor {
+class hallModule {
 public:
-	hallSensor(int pin);
+	hallModule(int pin);
 	int read(void);
 	int check(void);
 private:
 	int pin_number;
 };
 
-class ButtonModule {
+class buttonModule {
 public:
-	ButtonModule(int pin);
+	buttonModule(int pin);
 	int timeSincePressed(void);
 	int howManyTimes(void);
 	void timesReset(void);
 	int read(void);
 	int check(void);
 	void setDebounce(int time);
+	void echoOn(void);
+	void echoOff(void);
+	void debug(void);
 private:
 	int pin_number;
 	int order_number;
@@ -156,9 +159,9 @@ private:
 	int myID;
 };
 
-class buzzer{
+class buzzerModule{
 public:
-	buzzer(void);
+	buzzerModule(void);
 	void on(void);
 	void off(void);
 private:
@@ -166,9 +169,9 @@ private:
 };
 
 
-class IRsensor {
+class irModule {
 public:
-	IRsensor(int pin);
+	irModule(int pin);
 	int read(void);
 	void check(void);
 

@@ -6,59 +6,63 @@
 # Datatypes (KEYWORD1)
 #######################################
 	
-CdSModule			KEYWORD1
-temperatureSensor	KEYWORD1
-hallSensor			KEYWORD1
-ButtonModule		KEYWORD1
-ledModule			KEYWORD1
-ezDynamixel			KEYWORD1
-buzzer				KEYWORD1
-IRsensor			KEYWORD1
+cdsModule KEYWORD1
+temperatureModule KEYWORD1
+hallModule KEYWORD1
+buttonModule KEYWORD1
+ledModule KEYWORD1
+ezDynamixel KEYWORD1
+buzzerModule KEYWORD1
+irModule KEYWORD1
+microphoneModule KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-Read				KEYWORD2
-Check				KEYWORD2
-TimeSincePressed	KEYWORD2
-HowManyTimes		KEYWORD2
-TimesReset			KEYWORD2
-SetDebounce			KEYWORD2
-TurnOn				KEYWORD2
-TurnOff				KEYWORD2
-Blink				KEYWORD2
-ResetSettings		KEYWORD2
-ReadModelNumber		KEYWORD2
-ReadFirmwareVersion	KEYWORD2
-SetID				KEYWORD2
-SetBaud				KEYWORD2
-SetReturnDelay		KEYWORD2
-SetCWLimit			KEYWORD2
-SetCCWLimit			KEYWORD2
-SetTempLimit		KEYWORD2
-SetLowVoltage		KEYWORD2
-SetHighVoltage		KEYWORD2
-SetStatusReturn		KEYWORD2
-SetWheelMode		KEYWORD2
-SetJointMode		KEYWORD2
-SetPosition			KEYWORD2
-SetSpeed			KEYWORD2
-LedOn				KEYWORD2
-LedOff				KEYWORD2
-SetTorqueLimit		KEYWORD2
-ReadPosition		KEYWORD2
-ReadSpeed			KEYWORD2
-ReadLoad			KEYWORD2
-ReadVoltage			KEYWORD2
-ReadTemperature		KEYWORD2
-IsItWorking			KEYWORD2
-IsItMoving			KEYWORD2
-SetLock				KEYWORD2
-SetPunch			KEYWORD2
-IsItOverloaded		KEYWORD2
-IsItOverheated		KEYWORD2
-IsItOutvoltage		KEYWORD2
+debug KEYWORD2
+echoOff KEYWORD2
+echoOn KEYWORD2
+Read KEYWORD2
+Check KEYWORD2
+TimeSincePressed KEYWORD2
+HowManyTimes KEYWORD2
+TimesReset KEYWORD2
+SetDebounce KEYWORD2
+TurnOn KEYWORD2
+TurnOff KEYWORD2
+Blink KEYWORD2
+ResetSettings KEYWORD2
+ReadModelNumber KEYWORD2
+ReadFirmwareVersion KEYWORD2
+SetID KEYWORD2
+SetBaud KEYWORD2
+SetReturnDelay KEYWORD2
+SetCWLimit KEYWORD2
+SetCCWLimit KEYWORD2
+SetTempLimit KEYWORD2
+SetLowVoltage KEYWORD2
+SetHighVoltage KEYWORD2
+SetStatusReturn KEYWORD2
+SetWheelMode KEYWORD2
+SetJointMode KEYWORD2
+SetPosition KEYWORD2
+SetSpeed KEYWORD2
+LedOn KEYWORD2
+LedOff KEYWORD2
+SetTorqueLimit KEYWORD2
+ReadPosition KEYWORD2
+ReadSpeed KEYWORD2
+ReadLoad KEYWORD2
+ReadVoltage KEYWORD2
+ReadTemperature KEYWORD2
+IsItWorking KEYWORD2
+IsItMoving KEYWORD2
+SetLock KEYWORD2
+SetPunch KEYWORD2
+IsItOverloaded KEYWORD2
+IsItOverheated KEYWORD2
+IsItOutvoltage KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

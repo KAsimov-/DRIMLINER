@@ -76,6 +76,9 @@
   <ItemGroup>
     <Text Include="keywords.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="examples\Button.ino" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
