@@ -311,7 +311,7 @@ buttonModule::buttonModule(int pin){
 	}
 	_debounce[order_number] = 50 * 1000;
 	_countup[order_number] = 0;
-	_echo[order_number] = 0;
+	_echo[order_number] = 1;
 }
 
 
