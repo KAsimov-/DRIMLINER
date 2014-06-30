@@ -31,7 +31,7 @@ Board supported by Jeeho Ahn
 - inquiries please email
 mingyu@mingyu.co.kr
 
-Library Version 1.3
+Library Version 1.5
 For OPENCM IDE 1.0.1
 Last Updated on Jun. 28 2014
 
@@ -177,6 +177,22 @@ public:
 
 private:
 int pin_number;
+};
+
+class microphoneModule{
+public:
+	microphoneModule(int pin);
+	int timeSincePressed(void);
+	int howManyTimes(void);
+	void timesReset(void);
+	int read(void);
+	int check(void);
+	void setDelay(int time);
+	void echoOn(void);
+	void echoOff(void);
+private:
+	int pin_number;
+
 };
 
 #endif

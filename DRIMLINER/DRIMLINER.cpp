@@ -31,7 +31,7 @@ Board supported by Jeeho Ahn
 - inquiries please email
 mingyu@mingyu.co.kr
 
-Library Version 1.4
+Library Version 1.5
 For OPENCM IDE 1.0.1
 Last Updated on Jun. 30. 2014
 
@@ -645,3 +645,82 @@ void irModule::check(void){
 	SerialUSB.print(" is reading : ");
 	SerialUSB.println(analogRead(pin_number));
 }
+
+
+////////////////////////////////////////////////////////////////////////
+///////////////     M             I             C     //////////////////
+////////////////////////////////////////////////////////////////////////
+
+int _mic_pin;
+int _delayTime;
+int _micCount;
+int _echoMic;
+volatile long _lastMic;
+
+void echoMic(){
+		if (_echoMic > 0){
+			SerialUSB.print("Pin");
+			SerialUSB.print(_mic_pin);
+			SerialUSB.println(" Mic Spike");
+	}
+}
+
+void eventMic(){
+	if (micros() - _lastMic > _delayTime){
+		_micCount++;
+		_lastMic = micros();
+		echoMic();
+	}
+}
+
+microphoneModule::microphoneModule(int pin){
+	pin_number = pin;
+	pinMode(pin_number, INPUT);
+	attachInterrupt(pin_number, eventMic, RISING);
+	_delayTime = 50 * 1000;
+	_micCount = 0;
+	_echoMic = 1;
+}
+
+
+int microphoneModule::timeSincePressed(void){
+	return (micros() - _lastMic) / 1000;
+}
+
+int microphoneModule::howManyTimes(void){
+	return _micCount;
+}
+
+void microphoneModule::timesReset(void){
+	_micCount = 0;
+}
+
+int microphoneModule::read(void){
+	pinMode(pin_number, INPUT_ANALOG);
+	int analogValue = analogRead(pin_number);
+	pinMode(pin_number, INPUT);
+	return analogValue;
+}
+
+int microphoneModule::check(void){
+	SerialUSB.print("Mic at pin ");
+	SerialUSB.print(pin_number);
+	SerialUSB.print(" has been spiked ");
+	SerialUSB.print(_micCount);
+	SerialUSB.println(" times and");
+	SerialUSB.print((micros() - _lastMic) / 1000000);
+	SerialUSB.println(" seconds have passed since last spike");
+}
+
+void microphoneModule::setDelay(int time){
+	_delayTime = time * 1000;
+}
+
+void microphoneModule::echoOn(void){
+	_echoMic = 1;
+}
+
+void microphoneModule::echoOff(void){
+	_echoMic = 0;
+}
+
