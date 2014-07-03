@@ -27,13 +27,14 @@ Library for interfacing
 DRIMLINER Shield for OPENCM9.04
 
 Program written by Mingyu Kim
-Board supported by Jeeho Ahn
+		supported by Jeeho Ahn
+		supported by Jason Lee of ROBOTIS
 - inquiries please email
 mingyu@mingyu.co.kr
 
-Library Version 1.5
-For OPENCM IDE 1.0.1
-Last Updated on Jun. 30. 2014
+Library Version 1.6
+For OPENCM IDE 1.0.2
+Last Updated on July. 2. 2014
 
 Clubs Participating in DRIMLINER Project
 - KAsimov of Korea University
@@ -60,6 +61,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "DRIMLINER.h"
 
+#define ON 1
+#define OFF 0
+
 ////////////////////////////////////////////////////////////////////////
 ///////////////     C             D             S     //////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -77,18 +81,21 @@ cdsModule::cdsModule(int pin) {
 int cdsModule::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	int temp = map(analogRead(pin_number), 0, 4095, 0, range_number);
-	pinMode(pin_number, INPUT);
+	return temp;
+}
+
+int cdsModule::read(int range)
+{
+    pinMode(pin_number, INPUT_ANALOG);
+	int temp = map(analogRead(pin_number), 0, 4095, 0, range-1);
 	return temp;
 }
 
 int cdsModule::check(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	int temp = cdsModule::read();
-	SerialUSB.print("light sensor at pin ");
-	SerialUSB.print(pin_number);
-	SerialUSB.print(" is reading : ");
+	SerialUSB.print("light intesity ");
 	SerialUSB.println(temp);
-	pinMode(pin_number, INPUT);
 	return temp;
 }
 
@@ -106,17 +113,14 @@ temperatureModule::temperatureModule(int pin) {
 float temperatureModule::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	float temp = (((float)analogRead(pin_number) * 3300 / 4096)-400) / 19.5;
-	pinMode(pin_number, INPUT);
 	return temp;
 }
 
 float temperatureModule::check(void){
 	float temp = temperatureModule::read();
-	SerialUSB.print("temperature sensor at pin ");
-	SerialUSB.print(pin_number);
-	SerialUSB.print(" is reading : ");
-	SerialUSB.println(temp);
-	pinMode(pin_number, INPUT);
+	SerialUSB.print("temperature ");
+	SerialUSB.print(temp);
+    SerialUSB.println(" Celcius");
 	return temp;
 }
 
@@ -134,7 +138,6 @@ hallModule::hallModule(int pin) {
 int hallModule::read(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	int temp = 23 + (((analogRead(pin_number) * 3300 / 4096) - 1691) / 1.3);
-	pinMode(pin_number, INPUT);
 	return temp;
 }
 
@@ -249,10 +252,8 @@ buttonModule::buttonModule(int pin){
 		if (_button_pins[counter] < 0){
 			_button_pins[counter] = pin_number;
 			order_number = counter;
-			//SerialUSB.print("Before me ");
 			SerialUSB.print(order_number);
 			_int_pin_number[order_number] = pin_number;
-			//SerialUSB.println(" buttons are attached");
 			break;
 		}
 	}
@@ -260,52 +261,42 @@ buttonModule::buttonModule(int pin){
 	switch (order_number){
 	case 0:
 		attachInterrupt(pin_number, event0, RISING);
-		//SerialUSB.print("EVENT 0 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 1:
 		attachInterrupt(pin_number, event1, RISING);
-		//SerialUSB.print("EVENT 1 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 2:
 		attachInterrupt(pin_number, event2, RISING);
-		//SerialUSB.print("EVENT 2 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 3:
 		attachInterrupt(pin_number, event3, RISING);
-		//SerialUSB.print("EVENT 3 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 4:
 		attachInterrupt(pin_number, event4, RISING);
-		//SerialUSB.print("EVENT 4 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 5:
 		attachInterrupt(pin_number, event5, RISING);
-		//SerialUSB.print("EVENT 5 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 6:
 		attachInterrupt(pin_number, event6, RISING);
-		//SerialUSB.print("EVENT 6 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 7:
 		attachInterrupt(pin_number, event7, RISING);
-		//SerialUSB.print("EVENT 7 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 8:
 		attachInterrupt(pin_number, event8, RISING);
-		//SerialUSB.print("EVENT 8 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	case 9:
 		attachInterrupt(pin_number, event9, RISING);
-		//SerialUSB.print("EVENT 9 attached to ");
 		SerialUSB.println(pin_number);
 		break;
 	}
@@ -315,8 +306,8 @@ buttonModule::buttonModule(int pin){
 }
 
 
-int buttonModule::timeSincePressed(void){
-	return (micros() - _last_press[order_number]) / 1000;
+float buttonModule::readTime(void){
+	return (micros() - _last_press[order_number]) / 1000000;
 }
 
 int buttonModule::howManyTimes(void){
@@ -327,25 +318,25 @@ void buttonModule::timesReset(void){
 	_countup[order_number] = 0;
 }
 
-int buttonModule::read(void){
+int buttonModule::readDigital(void){
 	return digitalRead(pin_number);
+}
+
+int buttonModule::read(void){
+	int buttonCount = buttonModule::howManyTimes();
+	buttonModule::timesReset();
+	return buttonCount;
 }
 
 int buttonModule::check(void){
 	SerialUSB.print("button at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" has been pressed ");
+    SerialUSB.print(" ");
 	SerialUSB.print(_countup[order_number]);
-	SerialUSB.println(" times and");
+	SerialUSB.println(" times");
 	SerialUSB.print((micros() - _last_press[order_number]) / 1000000);
 	SerialUSB.println(" seconds have passed since last pressed");
-}
-
-void buttonModule::debug(void){
-	SerialUSB.print("button at pin ");
-	SerialUSB.print(pin_number);
-	SerialUSB.print(" is attached to event ");
-	SerialUSB.println(order_number);
 }
 
 void buttonModule::setDebounce(int time){
@@ -382,14 +373,12 @@ void _LED_BLINK(){
 			if ((micros() - _LED_NUMBER[counter][_start_time]) < _LED_NUMBER[counter][_duration]){
 				if (micros() - _LED_LAST_TIME[counter] > _LED_NUMBER[counter][_interval]){
 					if (!_LED_LAST_STATUS[counter]){
-						//pinMode(_LED_NUMBER[counter][_pin_number], OUTPUT);
 						digitalWrite(_LED_NUMBER[counter][_pin_number], HIGH);
 						_LED_LAST_STATUS[counter] = true;
 						_LED_LAST_TIME[counter] = micros();
 					}
 					else{
 						digitalWrite(_LED_NUMBER[counter][_pin_number], LOW);
-						//pinMode(_LED_NUMBER[counter][_pin_number], INPUT);
 						_LED_LAST_STATUS[counter] = false;
 						_LED_LAST_TIME[counter] = micros();
 					}
@@ -423,7 +412,6 @@ void _led_blink_init(void){
 	_has_led_init = true;
 }
 
-
 ledModule::ledModule(int pin){
 	pin_number = pin;
 	pinMode(pin_number, OUTPUT);
@@ -436,13 +424,11 @@ ledModule::ledModule(int pin){
 }
 
 void ledModule::on(void){
-	//pinMode(pin_number, OUTPUT);
 	digitalWrite(pin_number, HIGH);
 }
 
 void ledModule::off(void){
 	digitalWrite(pin_number, LOW);
-	//pinMode(pin_number, INPUT);
 }
 
 void ledModule::blink(float interval, int duration){
@@ -454,150 +440,343 @@ void ledModule::blink(float interval, int duration){
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////
-///////////////     D             X             L     //////////////////
+///////////////     D          X           L     ax-12//////////////////
 ////////////////////////////////////////////////////////////////////////
 
 Dynamixel Dxl(1);
 
-ezDynamixel::ezDynamixel(int id){
+axMotor::axMotor(int id){
 	myID = id;
+    axMotor::begin(3);
 }
 
-void ezDynamixel::begin(int baud){
+void axMotor::begin(int baud){
 	Dxl.begin(baud);
 }
 
-void ezDynamixel::resetSettings(void){
-	ezDynamixel::setBaud(1);
-	ezDynamixel::setReturnDelay(250);
-	ezDynamixel::setCWLimit(0);
-	ezDynamixel::setCCWLimit(1023);
-	ezDynamixel::setTempLimit(70);
-	ezDynamixel::setStatusReturn(2);
-
+void axMotor::resetSettings(void){
+	axMotor::setBaud(3);
+	axMotor::setReturnDelay(250);
+	axMotor::setCWLimit(0);
+	axMotor::setCCWLimit(1023);
+	axMotor::setTempLimit(70);
+	axMotor::setStatusReturn(2);
+    
 }
 
-void ezDynamixel::setWheelMode(void){
-	ezDynamixel::setCWLimit(0);
-	ezDynamixel::setCCWLimit(0);
+void axMotor::setWheelMode(void){
+	axMotor::setCWLimit(0);
+	axMotor::setCCWLimit(0);
 }
 
-void ezDynamixel::setJointMode(void){
-	ezDynamixel::setCWLimit(0);
-	ezDynamixel::setCCWLimit(1023);
+void axMotor::setJointMode(void){
+	axMotor::setCWLimit(0);
+	axMotor::setCCWLimit(1023);
 }
 
-int ezDynamixel::readModelNumber(void){
-	return Dxl.readWord(myID, P_MODEL_NUMBER_L);
+void axMotor::jointMove(int position)
+{
+    axMotor::setJointMode();
+    axMotor::setPosition(position);
 }
 
-int ezDynamixel::readFirmwareVersion(void){
-	return Dxl.readByte(myID, P_VERSION);
+void axMotor::jointMove(int position, int speed)
+{
+    axMotor::setJointMode();
+    axMotor::setSpeed(speed);
+    axMotor::setPosition(position);
+    
 }
 
-void ezDynamixel::setID(int newID){
-	Dxl.writeByte(myID, P_ID, newID);
+int axMotor::readModelNumber(void){
+	return Dxl.readWord(myID, 0);
 }
 
-void ezDynamixel::setBaud(int newBaud){
-	Dxl.writeByte(myID, P_BAUD_RATE, newBaud);
+int axMotor::readFirmwareVersion(void){
+	return Dxl.readByte(myID, 2);
 }
 
-void ezDynamixel::setReturnDelay(int newDelay){
-	Dxl.writeByte(myID, P_RETURN_DELAY_TIME, newDelay);
+void axMotor::setID(int newID){
+	Dxl.writeByte(myID, 3, newID);
 }
 
-void ezDynamixel::setCWLimit(int newLimit){
-	Dxl.writeWord(myID, P_CW_ANGLE_LIMIT_L, newLimit);
+void axMotor::setBaud(int newBaud){
+	Dxl.writeByte(myID, 4, newBaud);
 }
 
-void ezDynamixel::setCCWLimit(int newLimit){
-	Dxl.writeWord(myID, P_CCW_ANGLE_LIMIT_L, newLimit);
+void axMotor::setReturnDelay(int newDelay){
+	Dxl.writeByte(myID, 5, newDelay);
 }
 
-void ezDynamixel::setTempLimit(int newTemp){
-	Dxl.writeByte(myID, P_LIMIT_TEMPERATURE, newTemp);
+void axMotor::setCWLimit(int newLimit){
+	Dxl.writeWord(myID, 6, newLimit);
 }
 
-void ezDynamixel::setLowVoltage(int newVolt){
-	Dxl.writeByte(myID, P_DOWN_LIMIT_VOLTAGE, newVolt);
+void axMotor::setCCWLimit(int newLimit){
+	Dxl.writeWord(myID, 8, newLimit);
 }
 
-void ezDynamixel::setHighVoltage(int newVolt){
-	Dxl.writeByte(myID, P_UP_LIMIT_VOLTAGE, newVolt);
+void axMotor::setTempLimit(int newTemp){
+	Dxl.writeByte(myID, 11, newTemp);
 }
 
-void ezDynamixel::setStatusReturn(int newStat){
-	Dxl.writeByte(myID, P_RETURN_LEVEL, newStat);
+void axMotor::setLowVoltage(int newVolt){
+	Dxl.writeByte(myID, 12, newVolt);
 }
 
-void ezDynamixel::setPosition(int newPosition){
-	Dxl.writeWord(myID, P_GOAL_POSITION_L, newPosition);
+void axMotor::setHighVoltage(int newVolt){
+	Dxl.writeByte(myID, 13, newVolt);
 }
 
-void ezDynamixel::setSpeed(int newSpeed){
-	Dxl.writeWord(myID, P_GOAL_SPEED_L, newSpeed);
+void axMotor::setStatusReturn(int newStat){
+	Dxl.writeByte(myID, 16, newStat);
 }
 
-void ezDynamixel::ledOn(void){
-	Dxl.writeByte(myID, P_LED, 1);
+void axMotor::setPosition(int newPosition){
+	Dxl.writeWord(myID, 30, newPosition);
 }
 
-void ezDynamixel::ledOff(void){
-	Dxl.writeByte(myID, P_LED, 0);
+void axMotor::setSpeed(int newSpeed){
+	Dxl.writeWord(myID, 32, newSpeed);
 }
 
-void ezDynamixel::setTorqueLimit(int newLimit){
-	Dxl.writeWord(myID, P_TORQUE_LIMIT_L, newLimit);
+void axMotor::ledOn(void){
+	Dxl.writeByte(myID, 25, 1);
 }
 
-int ezDynamixel::readPosition(void){
-	return Dxl.readWord(myID, P_PRESENT_POSITION_L);
+void axMotor::ledOff(void){
+	Dxl.writeByte(myID, 25, 0);
 }
 
-int ezDynamixel::readSpeed(void){
-	return Dxl.readWord(myID, P_PRESENT_SPEED_L);
+void axMotor::setTorqueLimit(int newLimit){
+	Dxl.writeWord(myID, 34, newLimit);
 }
 
-int ezDynamixel::readLoad(void){
-	return Dxl.readWord(myID, P_PRESENT_LOAD_L);
+int axMotor::readPosition(void){
+	return Dxl.readWord(myID, 36);
 }
 
-int ezDynamixel::readVoltage(void){
-	return Dxl.readByte(myID, P_PRESENT_VOLTAGE);
+int axMotor::readSpeed(void){
+	return Dxl.readWord(myID, 38);
 }
 
-int ezDynamixel::readTemperature(void){
-	return Dxl.readByte(myID, P_PRESENT_TEMPERATURE);
+int axMotor::readLoad(void){
+	return Dxl.readWord(myID, 40);
 }
 
-int ezDynamixel::isItWorking(void){
-	return Dxl.readByte(myID, P_REGISTERED_INSTRUCTION);
+int axMotor::readVoltage(void){
+	return Dxl.readByte(myID, 42);
 }
 
-int ezDynamixel::isItMoving(void){
-	return Dxl.readByte(myID, P_MOVING);
+int axMotor::readTemperature(void){
+	return Dxl.readByte(myID, 43);
 }
 
-void ezDynamixel::lock(void){
+int axMotor::isItWorking(void){
+	return Dxl.readByte(myID, 44);
+}
+
+int axMotor::isItMoving(void){
+	return Dxl.readByte(myID, 46);
+}
+
+void axMotor::lock(void){
 	Dxl.writeByte(myID, 47, 1);
 }
 
-void ezDynamixel::unlock(void){
+void axMotor::unlock(void){
 	Dxl.writeByte(myID, 47, 0);
 }
 
-void ezDynamixel::setPunch(int newPunch){
+void axMotor::setPunch(int newPunch){
 	Dxl.writeWord(myID, 48, newPunch);
 }
 
-int ezDynamixel::isError(void){
-	return Dxl.readByte(myID, P_ALARM_SHUTDOWN);
+int axMotor::isError(void){
+	return Dxl.readByte(myID, 18);
 }
 
 
+
+////////////////////////////////////////////////////////////////////////
+///////////////     D          X          L     xl-320//////////////////
+////////////////////////////////////////////////////////////////////////
+
+
+xlMotor::xlMotor(int id){
+	myID = id;
+    xlMotor::begin(3);
+}
+
+void xlMotor::begin(int baud){
+	Dxl.begin(baud);
+}
+
+void xlMotor::resetSettings(void){
+	xlMotor::setBaud(3);
+	xlMotor::setReturnDelay(250);
+    Dxl.jointMode(myID);
+	xlMotor::setTempLimit(70);
+	xlMotor::setStatusReturn(2);
+    
+}
+
+
+void xlMotor::jointMove(int position)
+{
+    Dxl.jointMode(myID);
+    delayMicroseconds(1);
+    Dxl.setPosition(myID,position,512);
+    delayMicroseconds(1);
+}
+
+void xlMotor::jointMove(int position, int speed)
+{
+    Dxl.jointMode(myID);
+    delayMicroseconds(100);
+    Dxl.setPosition(myID,position,speed);
+    delayMicroseconds(1);
+}
+
+void xlMotor::wheelMove(char direction)
+{
+    Dxl.wheelMode(myID);
+    if (direction=='F')
+	{
+        Dxl.goalSpeed(myID, 512);
+    }
+    else if(direction=='R')
+	{
+        Dxl.goalSpeed(myID, 512| 0x400);
+    }
+    else if(direction=='S')
+    {
+        Dxl.goalSpeed(myID, 0);
+    }
+    
+}
+
+void xlMotor::wheelMove(char direction,int speed)
+{
+    if (direction=='F') {
+        Dxl.goalSpeed(myID, speed);
+    }
+    else if(direction=='R')
+    {
+        Dxl.goalSpeed(myID, speed| 0x400);
+    }
+   
+    
+}
+
+int xlMotor::readModelNumber(void){
+	return Dxl.readWord(myID, 0);
+}
+
+int xlMotor::readFirmwareVersion(void){
+	return Dxl.readByte(myID, 2);
+}
+
+void xlMotor::setID(int newID){
+	Dxl.writeByte(BROADCAST_ID, 3, newID);
+}
+
+void xlMotor::setBaud(int newBaud){
+	Dxl.writeByte(myID, 4, newBaud);
+}
+
+void xlMotor::setReturnDelay(int newDelay){
+	Dxl.writeByte(myID, 5, newDelay);
+}
+
+void xlMotor::setCWLimit(int newLimit){
+	Dxl.writeWord(myID, 6, newLimit);
+}
+
+void xlMotor::setCCWLimit(int newLimit){
+	Dxl.writeWord(myID, 8, newLimit);
+}
+
+void xlMotor::setTempLimit(int newTemp){
+	Dxl.writeByte(myID, 12, newTemp);
+}
+
+void xlMotor::setLowVoltage(int newVolt){
+	Dxl.writeByte(myID, 13, newVolt);
+}
+
+void xlMotor::setHighVoltage(int newVolt){
+	Dxl.writeByte(myID, 14, newVolt);
+}
+
+void xlMotor::setStatusReturn(int newStat){
+	Dxl.writeByte(myID, 17, newStat);
+}
+
+void xlMotor::setPosition(int newPosition){
+	Dxl.writeWord(myID, 30, newPosition);
+}
+
+void xlMotor::setSpeed(int newSpeed){
+	Dxl.writeWord(myID, 32, newSpeed);
+}
+
+void xlMotor::ledOn(void){
+	Dxl.writeByte(myID, 25, 1);
+}
+
+void xlMotor::ledOff(void){
+	Dxl.writeByte(myID, 25, 0);
+}
+
+void xlMotor::setTorqueLimit(int newLimit){
+	Dxl.writeWord(myID, 15, newLimit);
+}
+
+int xlMotor::readPosition(void){
+	return Dxl.readWord(myID, 37);
+}
+
+int xlMotor::readSpeed(void){
+	return Dxl.readWord(myID, 39);
+}
+
+int xlMotor::readLoad(void){
+	return Dxl.readWord(myID, 41);
+}
+
+int xlMotor::readVoltage(void){
+	return Dxl.readByte(myID, 45);
+}
+
+int xlMotor::readTemperature(void){
+	return Dxl.readByte(myID, 46);
+}
+
+int xlMotor::isItWorking(void){
+	return Dxl.readByte(myID, 47);
+}
+
+int xlMotor::isItMoving(void){
+	return Dxl.readByte(myID, 49);
+}
+
+void xlMotor::lock(void){
+	Dxl.writeByte(myID, 47, 1);
+}
+
+void xlMotor::unlock(void){
+	Dxl.writeByte(myID, 47, 0);
+}
+
+void xlMotor::setPunch(int newPunch){
+	Dxl.writeWord(myID, 48, newPunch);
+}
+
+int xlMotor::isError(void){
+	return Dxl.readByte(myID, 18);
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -624,26 +803,148 @@ void buzzerModule::off(void){
 ///////////////     I                           R     //////////////////
 ////////////////////////////////////////////////////////////////////////
 
-irModule::irModule(int pin){
-	pin_number = pin;
-	pinMode(pin_number, INPUT_ANALOG);
+
+
+
+int _infra_pins[4] = { -1, -1, -1, -1};
+int _infra_debounce[4];
+int _infra_countup[4];
+int _infra_echo[4];
+volatile long _last_infra_press[4];
+
+void echoInfra(){
+	for (int counter = 0; counter < 4; counter++){
+		if (_infra_echo[counter] > 0){
+			SerialUSB.print("Infrared");
+			SerialUSB.print(_infra_pins[counter]);
+			SerialUSB.println(" Activated");
+		}
+	}
 }
 
-int irModule::read(void){
-	int readvalue = analogRead(pin_number);
-	if (readvalue > 1200){
-		return 1;
+void infraevent0(){
+	if (micros() - _last_infra_press[0] > _infra_debounce[0]){
+		_infra_countup[0]++;
+		_last_infra_press[0] = micros();
+		echoInfra();
 	}
-	else if (readvalue < 1200) {
-		return 0;
+}
+void infraevent1(){
+	if (micros() - _last_infra_press[1] > _infra_debounce[1]){
+		_infra_countup[1]++;
+		_last_infra_press[1] = micros();
+		echoInfra();
 	}
+}
+void infraevent2(){
+	if (micros() - _last_infra_press[2] > _infra_debounce[2]){
+		_infra_countup[2]++;
+		_last_infra_press[2] = micros();
+		echoInfra();
+	}
+}
+void infraevent3(){
+	if (micros() - _last_infra_press[3] > _infra_debounce[3]){
+		_infra_countup[3]++;
+		_last_infra_press[3] = micros();
+		echoInfra();
+	}
+}
+
+irModule::irModule(int pin){
+
+	pin_number = pin;
+	pinMode(pin_number, INPUT);
+	thr = 1200;
+
+	for (int counter = 0; counter < 10; counter++){
+		if (_button_pins[counter] < 0){
+			_button_pins[counter] = pin_number;
+			orderNumber = counter;
+			break;
+		}
+	}
+
+	switch (orderNumber){
+	case 0:
+		attachInterrupt(pin_number, infraevent0, RISING);
+		break;
+	case 1:
+		attachInterrupt(pin_number, infraevent1, RISING);
+		break;
+	case 2:
+		attachInterrupt(pin_number, infraevent2, RISING);
+		break;
+	case 3:
+		attachInterrupt(pin_number, infraevent3, RISING);
+		break;
+	}
+	_infra_debounce[orderNumber] = 50 * 1000;
+	_infra_countup[orderNumber] = 0;
+	_infra_echo[orderNumber] = 1;
+}
+
+void irModule::setThreshold(int threshold){
+	thr = threshold;
+}
+
+
+int irModule::readAnalog(void){
+	pinMode(pin_number, INPUT_ANALOG);
+	int analogValue = analogRead(pin_number);
+	pinMode(pin_number, INPUT);
+	return analogValue;
 }
 
 void irModule::check(void){
 	SerialUSB.print("Infrared sensor at pin ");
 	SerialUSB.print(pin_number);
 	SerialUSB.print(" is reading : ");
-	SerialUSB.println(analogRead(pin_number));
+	SerialUSB.println(irModule::readAnalog());
+	SerialUSB.print("digital threshold is set to ");
+	SerialUSB.println(thr);
+	SerialUSB.print("Infrared sensor at pin ");
+	SerialUSB.print(pin_number);
+	SerialUSB.print(" has been activated ");
+	SerialUSB.print(_infra_countup[orderNumber]);
+	SerialUSB.println(" times");
+	SerialUSB.print((micros() - _last_infra_press[orderNumber]) / 1000000);
+	SerialUSB.println(" seconds have passed since last pressed");
+}
+
+float irModule::readTime(void){
+	return (micros() - _last_infra_press[orderNumber]) / 1000000;
+}
+
+int irModule::howManyTimes(void){
+	return _countup[orderNumber];
+}
+
+void irModule::timesReset(void){
+	_countup[orderNumber] = 0;
+}
+
+int irModule::readDigital(void){
+	return digitalRead(orderNumber);
+}
+
+int irModule::read(void){
+	int irCount = irModule::howManyTimes();
+	irModule::timesReset();
+	return irCount;
+}
+
+
+void irModule::setDebounce(int time){
+	_infra_debounce[orderNumber] = time * 1000;
+}
+
+void irModule::echoOn(void){
+	_infra_echo[orderNumber] = 1;
+}
+
+void irModule::echoOff(void){
+	_infra_echo[orderNumber] = 0;
 }
 
 
@@ -682,7 +983,6 @@ microphoneModule::microphoneModule(int pin){
 	_echoMic = 1;
 }
 
-
 int microphoneModule::timeSincePressed(void){
 	return (micros() - _lastMic) / 1000;
 }
@@ -695,11 +995,21 @@ void microphoneModule::timesReset(void){
 	_micCount = 0;
 }
 
-int microphoneModule::read(void){
+int microphoneModule::readAnalog(void){
 	pinMode(pin_number, INPUT_ANALOG);
 	int analogValue = analogRead(pin_number);
 	pinMode(pin_number, INPUT);
 	return analogValue;
+}
+
+int microphoneModule::readDigital(void){
+	return digitalRead(pin_number);
+}
+
+int microphoneModule::read(void){
+	int micCount = microphoneModule::howManyTimes();
+	microphoneModule::timesReset();
+	return micCount;
 }
 
 int microphoneModule::check(void){

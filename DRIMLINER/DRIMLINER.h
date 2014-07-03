@@ -27,13 +27,14 @@ Library for interfacing
 DRIMLINER Shield for OPENCM9.04
 
 Program written by Mingyu Kim
-Board supported by Jeeho Ahn
+supported by Jeeho Ahn
+supported by Jason Lee of ROBOTIS
 - inquiries please email
 mingyu@mingyu.co.kr
 
-Library Version 1.5
-For OPENCM IDE 1.0.1
-Last Updated on Jun. 28 2014
+Library Version 1.6
+For OPENCM IDE 1.0.2
+Last Updated on July. 2. 2014
 
 Clubs Participating in DRIMLINER Project
 - KAsimov of Korea University
@@ -63,11 +64,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wirish.h"
 #include "dynamixel.h"
 
+#define ON 1
+#define OFF 0
+
 class cdsModule {
 public:
 	cdsModule(int pin, int range);
 	cdsModule(int pin);
 	int read(void);
+	int read(int range);
 	int check(void);
 private:
 	int pin_number;
@@ -95,15 +100,15 @@ private:
 class buttonModule {
 public:
 	buttonModule(int pin);
-	int timeSincePressed(void);
+	float readTime(void);
 	int howManyTimes(void);
 	void timesReset(void);
+	int readDigital(void);
 	int read(void);
 	int check(void);
 	void setDebounce(int time);
 	void echoOn(void);
 	void echoOff(void);
-	void debug(void);
 private:
 	int pin_number;
 	int order_number;
@@ -120,9 +125,9 @@ private:
 	int order_number;
 };
 
-class ezDynamixel {
+class axMotor {
 public:
-	ezDynamixel(int id);
+	axMotor(int id);
 	void begin(int baud);
 	void resetSettings(void);
 	int readModelNumber(void);
@@ -138,6 +143,8 @@ public:
 	void setStatusReturn(int newStat);
 	void setWheelMode(void);
 	void setJointMode(void);
+    void jointMove(int position);
+    void jointMove(int position, int speed);
 	void setPosition(int newPosition);
 	void setSpeed(int newSpeed);
 	void ledOn(void);
@@ -159,6 +166,47 @@ private:
 	int myID;
 };
 
+class xlMotor {
+public:
+	xlMotor(int id);
+	void begin(int baud);
+	void resetSettings(void);
+	int readModelNumber(void);
+	int readFirmwareVersion(void);
+	void setID(int newID);
+	void setBaud(int newBaud);
+	void setReturnDelay(int newDelay);
+	void setCWLimit(int newLimit);
+	void setCCWLimit(int newLimit);
+	void setTempLimit(int newTemp);
+	void setLowVoltage(int newVolt);
+	void setHighVoltage(int newVolt);
+	void setStatusReturn(int newStat);
+    void jointMove(int position);
+    void jointMove(int position, int speed);
+    void wheelMove(char direction);
+    void wheelMove(char direction, int speed);
+	void setPosition(int newPosition);
+	void setSpeed(int newSpeed);
+	void ledOn(void);
+	void ledOff(void);
+	void setTorqueLimit(int newLimit);
+	int readPosition(void);
+	int readSpeed(void);
+	int readLoad(void);
+	int readVoltage(void);
+	int readTemperature(void);
+	int isItWorking(void);
+	int isItMoving(void);
+	void lock(void);
+	void unlock(void);
+	void setPunch(int newPunch);
+	int isError(void);
+    
+private:
+	int myID;
+};
+
 class buzzerModule{
 public:
 	buzzerModule(void);
@@ -172,11 +220,22 @@ private:
 class irModule {
 public:
 	irModule(int pin);
+	void setThreshold(int threshold);
 	int read(void);
+	float readTime(void);
+	int howManyTimes(void);
+	void timesReset(void);
+	int readDigital(void);
+	int readAnalog(void);
 	void check(void);
+	void setDebounce(int time);
+	void echoOn(void);
+	void echoOff(void);
 
 private:
-int pin_number;
+	int pin_number;
+	int thr;
+	int orderNumber;
 };
 
 class microphoneModule{
@@ -185,6 +244,8 @@ public:
 	int timeSincePressed(void);
 	int howManyTimes(void);
 	void timesReset(void);
+	int readDigital(void);
+	int readAnalog(void);
 	int read(void);
 	int check(void);
 	void setDelay(int time);

@@ -20,11 +20,9 @@ microphoneModule KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-debug KEYWORD2
 echoOff KEYWORD2
 echoOn KEYWORD2
-Read KEYWORD2
-Check KEYWORD2
+check KEYWORD2
 TimeSincePressed KEYWORD2
 HowManyTimes KEYWORD2
 TimesReset KEYWORD2
@@ -51,6 +49,9 @@ SetSpeed KEYWORD2
 LedOn KEYWORD2
 LedOff KEYWORD2
 SetTorqueLimit KEYWORD2
+read KEYWORD2
+readAnalog KEYWORD2
+readDigital KEYWORD2
 ReadPosition KEYWORD2
 ReadSpeed KEYWORD2
 ReadLoad KEYWORD2
@@ -67,3 +68,7 @@ IsItOutvoltage KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+
+ON LITERAL1
+OFF LITERAL1
